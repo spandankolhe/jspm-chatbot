@@ -1,0 +1,6 @@
+Flask==3.1.2
+Flask-Cors==6.0.1
+rapidfuzz==3.14.3
+sentence-transformers==5.1.2
+torch==2.9.0
+numpy==2.3.4
