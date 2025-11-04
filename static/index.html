@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>College Info Chatbot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: #F7F7FC;
+      --chat-bg: #fff;
+      --user-bg: #6366f1;
+      --user-color: #fff;
+      --bot-bg: #ececff;
+      --bot-color: #0d133b;
+      --header-bg: linear-gradient(90deg, #6366f1, #06b6d4);
+      --header-color: #fff;
+      --chat-input-bg: #f0f2f8;
+      --border: #e5e7eb;
+      --scrollbar: #b3bce1;
+    }
+
+ [data-theme="dark"] {
+  --bg: #181b2e;
+  --chat-bg: #232443;
+  --user-bg: linear-gradient(90deg, #4056d6 60%, #06b6d4);
+  --user-color: #fff;
+  --bot-bg: #303366;
+  --bot-color: #d1e7fe;
+  --header-bg: linear-gradient(90deg, #1a1b40 60%, #06b6d4 120%);
+  --header-glow: 0 6px 50px 0 #4be4ff40;
+  --header-color: #e4e7f7;
+  --chat-input-bg: #303366;
+  --chat-input-focus: #181b2e;
+  --border: #23254a;
+  --scrollbar: #70d2ff;
+
+  /* Fix input text color for dark mode */
+  .chat-input {
+    color: #e0e7fe;
+    background: var(--chat-input-bg);
+    border-color: var(--border);
+  }
+  .chat-input::placeholder {
+    color: #a5b4fc;
+  }
+}
+
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      width: 100vw;
+      height: 100vh;
+      font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    }
+
+    .chat-wrapper {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+    }
+
+    .chat-header {
+      background: var(--header-bg);
+      color: var(--header-color);
+      font-size: 1.4rem;
+      font-weight: 500;
+      padding: 25px 35px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 16px rgba(50,60,100,0.07);
+    }
+
+    .theme-toggle {
+      cursor: pointer;
+      padding: 5px 16px;
+      border-radius: 13px;
+      border: 1px solid #6edce8;
+      background: rgba(210,210,255,0.12);
+      color: inherit;
+      font-size: 1em;
+    }
+
+    .chat-area {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      background: var(--bg);
+    }
+
+    .chat {
+      flex: 1;
+      max-width: 900px;
+      background: var(--chat-bg);
+      margin: 25px;
+      border-radius: 20px;
+      box-shadow: 0 4px 42px rgba(36,45,86,0.10);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .messages {
+      padding: 30px 40px;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--scrollbar) #e0e5ef;
+    }
+
+    .msg-row {
+      display: flex;
+    }
+
+    .msg-row.user {
+      justify-content: flex-end;
+    }
+
+    .msg-bubble {
+      border-radius: 16px;
+      padding: 15px 22px;
+      font-size: 1.05em;
+      max-width: 65vw;
+      white-space: pre-line;
+      box-shadow: 0 1px 9px rgba(36,45,86,0.10);
+    }
+
+    .msg-row.user .msg-bubble {
+      background: var(--user-bg);
+      color: var(--user-color);
+      border-bottom-right-radius: 3px;
+      margin-left: 60px;
+    }
+
+    .msg-row.bot .msg-bubble {
+      background: var(--bot-bg);
+      color: var(--bot-color);
+      border-bottom-left-radius: 3px;
+      margin-right: 60px;
+    }
+
+    .msg-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 30px;
+      font-size: 1.3em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 18px;
+    }
+
+    .msg-row.user .msg-avatar {
+      background: #6366f1;
+      color: #fff;
+    }
+
+    .msg-row.bot .msg-avatar {
+      background: #06b6d4;
+      color: #fff;
+    }
+
+    .chat-input-row {
+      display: flex;
+      align-items: flex-end;
+      padding: 22px 40px;
+      background: var(--chat-input-bg);
+      border-top: 1.5px solid var(--border);
+      gap: 10px;
+    }
+
+    .chat-input {
+      flex: 1;
+      font-size: 1.07em;
+      border-radius: 18px;
+      padding: 13px 19px;
+      border: 1.5px solid var(--border);
+      background: var(--chat-bg);
+      color: inherit;
+      resize: none;
+      min-height: 50px;
+      max-height: 180px;
+      outline: none;
+    }
+
+    .send-btn {
+      padding: 11px 26px;
+      border-radius: 13px;
+      border: none;
+      cursor: pointer;
+      background: linear-gradient(90deg, #6366f1 60%, #06b6d4);
+      color: #fff;
+      font-size: 1.1em;
+      font-weight: 500;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="chat-wrapper" data-theme="light">
+    <div class="chat-header">
+      <span>🏫 JSPM’s Automation and Robotics Department Info Chatbot</span>
+      <button class="theme-toggle" id="themeToggle">🌙 Dark mode</button>
+    </div>
+
+    <div class="chat-area">
+      <div class="chat">
+        <div id="chatMessages" class="messages">
+          <div class="msg-row bot">
+            <div class="msg-avatar">🤖</div>
+            <div class="msg-bubble">
+              Hello! I can answer your college-related questions.
+            </div>
+          </div>
+        </div>
+
+        <form id="chatForm" class="chat-input-row" autocomplete="off">
+          <textarea id="chatInput" class="chat-input"
+            placeholder="Ask something about the college..." required></textarea>
+          <button type="submit" class="send-btn">Send</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const wrapper = document.querySelector('.chat-wrapper');
+    const themeBtn = document.getElementById('themeToggle');
+    let isDark = false;
+
+    themeBtn.onclick = function () {
+      isDark = !isDark;
+      wrapper.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      themeBtn.textContent = isDark ? "☀️ Light mode" : "🌙 Dark mode";
+    };
+
+    // Chat logic
+    const form = document.getElementById('chatForm');
+    const input = document.getElementById('chatInput');
+    const messages = document.getElementById('chatMessages');
+
+    // === Connect to Flask backend ===
+    const API_ENDPOINT = "http://127.0.0.1:5000/api/chat";
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const userText = input.value.trim();
+      if (!userText) return;
+
+      addMessage(userText, 'user');
+      input.value = '';
+
+      const msgElem = addMessage('Thinking…', 'bot', true);
+
+      try {
+        const res = await fetch(API_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: userText })
+        });
+        const data = await res.json();
+        msgElem.querySelector('.msg-bubble').textContent =
+          data.reply || "Sorry, I couldn't find an answer.";
+      } catch {
+        msgElem.querySelector('.msg-bubble').textContent =
+          "Error: Could not connect to backend.";
+      }
+
+      messages.scrollTop = messages.scrollHeight;
+    });
+
+    function addMessage(text, sender, isTemp = false) {
+      const row = document.createElement('div');
+      row.className = 'msg-row ' + sender;
+
+      const avatar = document.createElement('div');
+      avatar.className = 'msg-avatar';
+      avatar.textContent = sender === 'user' ? '🧑' : '🤖';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'msg-bubble';
+      bubble.textContent = text;
+
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+      messages.appendChild(row);
+
+      return row;
+    }
+  </script>
+</body>
+</html>
